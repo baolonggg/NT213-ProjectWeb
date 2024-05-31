@@ -1,0 +1,20 @@
+2024-05-30 13:09:31.674+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 10852, JVM running for 4.019 s)
+2024-05-30 13:09:31.687+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
+2024-05-30 13:21:27.846+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 12796, JVM running for 3.428 s)
+2024-05-30 13:21:27.854+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
+2024-05-30 13:22:02.341+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 3608, JVM running for 4.117 s)
+2024-05-30 13:22:02.353+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
+2024-05-30 13:23:50.458+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 16504, JVM running for 3.895 s)
+2024-05-30 13:23:50.469+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
+2024-05-30 13:25:14.132+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 19500, JVM running for 5.005 s)
+2024-05-30 13:25:14.139+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
+2024-05-30 13:27:41.602+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 18912, JVM running for 3.87 s)
+2024-05-30 13:27:41.612+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
+2024-05-30 13:31:11.999+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 19728, JVM running for 3.898 s)
+2024-05-30 13:31:12.010+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
+2024-05-30 13:36:41.949+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 2896, JVM running for 3.934 s)
+2024-05-30 13:36:41.962+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
+2024-05-30 13:42:56.102+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 396, JVM running for 3.199 s)
+2024-05-30 13:42:56.107+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
+2024-05-31 08:44:24.187+07:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.4.19 started successfully (PID 15080, JVM running for 2.671 s)
+2024-05-31 08:44:24.199+07:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.8, vendor: Oracle Corporation, home: C:\Program Files\Java\jdk-17
