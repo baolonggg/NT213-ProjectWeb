@@ -73,9 +73,17 @@ jobs:
         with:
           azPSVersion: 'latest'
           inlineScript: |
-            # PowerShell script to authenticate using federated token
-            Connect-AzAccount -Identity
-          
+            $ErrorActionPreference = "Stop"
+            $WarningPreference = "SilentlyContinue"
+            try {
+              Connect-AzAccount -Identity -ErrorAction Stop
+              Write-Output "Azure PowerShell login successful."
+            }
+            catch {
+              Write-Error "Azure PowerShell login failed: $_"
+              exit 1
+            }
+
       - name: Update image name in manifest file
         run: |
           $line = Get-Content src/deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
@@ -85,7 +93,7 @@ jobs:
       - name: Commit changes in manifest to repo
         run: | 
           git config user.name "GitHub Actions Bot"
-          git config user.email ""
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add src/deployment.yaml
           git commit -m "Update image version in K8s Deployment manifests file"
           git push origin
