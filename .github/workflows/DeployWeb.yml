@@ -7,11 +7,6 @@ on:
         description: 'The Name of the ACR resource'
         required: true
         type: string
-      APPNAME:
-        description: 'The Name of the Application to deploy'
-        default: "java"
-        required: true
-        type: string
       ENVIRONMENT:
         description: 'A GitHub Environment to pull action secrets from'
         required: true
@@ -65,12 +60,10 @@ jobs:
 
       # Builds and Pushes the container image to the Azure Container Registry (ACR)
       - name: Container build and push to a Azure Container Registry (ACR)
-        env:
-          APPNAME: "${{ inputs.APPNAME }}"
         run: |
-          cd "workloads/$APPNAME"
-          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/${{ inputs.APPNAME }}:${{ github.run_number }}
-          docker push ${{ inputs.ACRNAME }}.azurecr.io/${{ inputs.APPNAME }}:${{ github.run_number }}
+          cd "src"
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/app:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/app:${{ github.run_number }}
 
   Update-K8s-Manifests:
     name: Update K8s Deployment Manifest with Image Version
@@ -86,15 +79,15 @@ jobs:
       uses: azure/powershell@v1
       with:
         inlineScript: |
-          $line = Get-Content workloads/flask/deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
-          $content = Get-Content workloads/flask/deployment.yaml
-          $content | ForEach-Object {$_ -replace $line,"        image: ${{ inputs.ACRNAME }}.azurecr.io/${{ inputs.APPNAME }}:${{ github.run_number }}"} | Set-Content workloads/flask/deployment.yaml
+          $line = Get-Content src/deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+          $content = Get-Content src/deployment.yaml
+          $content | ForEach-Object {$_ -replace $line,"        image: ${{ inputs.ACRNAME }}.azurecr.io/${{ inputs.app }}:${{ github.run_number }}"} | Set-Content src/deployment.yaml
         azPSVersion: "latest"
     
     - name: Commit changes in manifest to repo
       run: | 
         git config user.name "GitHub Actions Bot"
         git config user.email ""
-        git add workloads/flask/deployment.yaml
+        git add src/deployment.yaml
         git commit -m "Update image version in K8s Deployment manifests file"
         git push origin
