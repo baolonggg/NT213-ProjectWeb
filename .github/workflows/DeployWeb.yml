@@ -13,38 +13,34 @@ on:
         type: environment
 
 permissions:
-      id-token: write
-      contents: write
+  id-token: write
+  contents: write
 
 jobs:
   BuildPush:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.Environment }}
+    environment: ${{ inputs.ENVIRONMENT }}
     steps:
-    
-      # Get application code from repo
       - name: Get application code from repo
-        uses: actions/checkout@main
+        uses: actions/checkout@v2
         with:
-          repository: ${{ inputs.AppRepo}}
-          #ref: ${{ inputs.AppRepoRef}}
-      
-      # Logs into your Azure subscription
-      - uses: azure/login@v1
+          repository: ${{ github.repository }}
+
+      - name: Azure Login
+        uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      
+
       - name: Connect to Azure Container Registry (ACR)
         id: acrconnect
         run: |
-          echo "Retrieving access token from ${{ inputs.ACRNAME}}"
-          TOKEN=$(az acr login -n ${{ inputs.ACRNAME}} --expose-token)
+          echo "Retrieving access token from ${{ inputs.ACRNAME }}"
+          TOKEN=$(az acr login -n ${{ inputs.ACRNAME }} --expose-token)
 
-          if [ -z "$TOKEN" ]
-          then
+          if [ -z "$TOKEN" ]; then
             echo "ACR Token was not retrieved successfully"
             exit 1
           fi
@@ -58,7 +54,6 @@ jobs:
           echo "Passing token as stdin to docker login"
           echo $ACRTOKEN | docker login $LOGINSERVER -u 00000000-0000-0000-0000-000000000000 --password-stdin
 
-      # Builds and Pushes the container image to the Azure Container Registry (ACR)
       - name: Container build and push to a Azure Container Registry (ACR)
         run: |
           cd "src"
@@ -68,26 +63,29 @@ jobs:
   Update-K8s-Manifests:
     name: Update K8s Deployment Manifest with Image Version
     needs: BuildPush
-    environment: ${{ inputs.Environment }}
+    environment: ${{ inputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
 
-    # Checks out the baseline repository
-    - uses: actions/checkout@v2
-
-    - name: Update image name in manifest file
-      uses: azure/powershell@v1
-      with:
-        inlineScript: |
+      - name: Azure PowerShell Login
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: 'latest'
+          inlineScript: |
+            # PowerShell script to authenticate using federated token
+            Connect-AzAccount -Identity
+          
+      - name: Update image name in manifest file
+        run: |
           $line = Get-Content src/deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
           $content = Get-Content src/deployment.yaml
-          $content | ForEach-Object {$_ -replace $line,"        image: ${{ inputs.ACRNAME }}.azurecr.io/${{ inputs.app }}:${{ github.run_number }}"} | Set-Content src/deployment.yaml
-        azPSVersion: "latest"
-    
-    - name: Commit changes in manifest to repo
-      run: | 
-        git config user.name "GitHub Actions Bot"
-        git config user.email ""
-        git add src/deployment.yaml
-        git commit -m "Update image version in K8s Deployment manifests file"
-        git push origin
+          $content | ForEach-Object {$_ -replace $line,"        image: ${{ inputs.ACRNAME }}.azurecr.io/app:${{ github.run_number }}"} | Set-Content src/deployment.yaml
+      
+      - name: Commit changes in manifest to repo
+        run: | 
+          git config user.name "GitHub Actions Bot"
+          git config user.email ""
+          git add src/deployment.yaml
+          git commit -m "Update image version in K8s Deployment manifests file"
+          git push origin
