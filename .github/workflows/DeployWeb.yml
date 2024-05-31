@@ -35,7 +35,7 @@ jobs:
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          subscription-id: "5aac3bd7-2c9e-4281-80ce-b44c8acd3030"
           enable-AzPSSession: true
       
       - name: Connect to Azure Container Registry (ACR)
