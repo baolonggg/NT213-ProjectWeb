@@ -1,4 +1,4 @@
-name: Deploy Web Java - GitOps
+name: 2 Microservice App Deploy - GitOps
 
 on: 
   workflow_dispatch:
@@ -33,7 +33,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-
+      
       - name: Connect to Azure Container Registry (ACR)
         id: acrconnect
         run: |
@@ -54,33 +54,37 @@ jobs:
           echo "Passing token as stdin to docker login"
           echo $ACRTOKEN | docker login $LOGINSERVER -u 00000000-0000-0000-0000-000000000000 --password-stdin
 
-      - name: Build and push app image
+      - name: Build and push order-service image
         run: |
-          cd "src"
-          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/app:${{ github.run_number }}
-          docker push ${{ inputs.ACRNAME }}.azurecr.io/app:${{ github.run_number }}
+          cd workloads/src/order-service
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}
+
 
   Update-K8s-Manifests:
     name: Update K8s Deployment Manifest with Image Version
-    needs: BuildPush
+    needs: Run-Kubescape
     environment: ${{ inputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: Azure PowerShell Login
+      - name: Update image name in manifest file
         uses: azure/powershell@v1
         with:
-          azPSVersion: 'latest'
           inlineScript: |
-            $line = Get-Content src/deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
-            $content = Get-Content src/deployment.yaml
-            $content | ForEach-Object {$_ -replace $line,"        image: ${{ inputs.ACRNAME }}.azurecr.io/app:${{ github.run_number }}"} | Set-Content src/deployment.yaml
-      
+            $line1 = Get-Content workloads/src/order-service.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+
+            $content1 = Get-Content workloads/src/order-service.deployment.yaml
+            $content1 | ForEach-Object {$_ -replace $line1,"        image: ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}"} | Set-Content workloads/src/order-service.deployment.yaml
+        
+         azPSVersion: "latest"
+    
+    
       - name: Commit changes in manifest to repo
         run: | 
           git config user.name "GitHub Actions Bot"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/deployment.yaml
+          git config user.email ""
+          git add workloads/src/order-service.deployment.yaml
           git commit -m "Update image version in K8s Deployment manifests file"
           git push origin
